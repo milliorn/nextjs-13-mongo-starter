@@ -3,6 +3,6 @@ module.exports = {
 	reactStrictMode: true,
 	experimental: {
 		appDir: true,
-		serverComponentsExternalPackages: ["mongoose"],
+		serverComponentsExternalPackages: [ "mongoose" ],
 	},
 };

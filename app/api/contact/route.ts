@@ -6,7 +6,11 @@ import Message from "../../../models/Message"; // Importing the Message model
 export async function POST(req: NextRequest, res: NextResponse) {
 
 	// Constructing the MongoDB connection URI using environment variables
-	const MONGODB_URI = `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_CLUSTER}.x4n7w9z.mongodb.net/`;
+	const MONGO_USERNAME = process.env.MONGO_USERNAME;
+	const MONGO_PASSWORD = process.env.MONGO_PASSWORD;
+	const MONGODB_CLUSTER = process.env.MONGODB_CLUSTER;
+	// Use MONGODB_URI in your code to connect to MongoDB
+	const MONGODB_URI = `mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGODB_CLUSTER}`;
 
 	let client;
 
@@ -21,16 +25,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
 	const { name, email, company, message } = data; // Extracting relevant data from the request body
 
-	if (
-		!name ||
-		!company ||
-		!message ||
-		!email ||
-		!email.includes("@") ||
-		message.trim() === "" ||
-		name.trim() === ""
-	) {
-		// Checking if any required fields are missing or if email is invalid
+	// Checking if any required fields are missing or if email is invalid
+	if (!name || !company || !message || !email || !email.includes("@") || message.trim() === "" || name.trim() === "") {
 		NextResponse.json(
 			{ message: "Invalid input - fill all the fields" },
 			{
