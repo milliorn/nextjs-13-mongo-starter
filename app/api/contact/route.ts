@@ -1,23 +1,25 @@
-import React from "react";
-import { NextResponse, NextRequest } from "next/server";
-import mongoose from "mongoose";
-import Message from "../../../models/Message";
+import mongoose from "mongoose"; // Importing the Mongoose library for MongoDB interaction
+import { NextRequest, NextResponse } from "next/server"; // Importing Next.js server components
+import Message from "../../../models/Message"; // Importing the Message model
 
+// Handling a POST request to this endpoint
 export async function POST(req: NextRequest, res: NextResponse) {
+
+	// Constructing the MongoDB connection URI using environment variables
 	const MONGODB_URI = `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_CLUSTER}.x4n7w9z.mongodb.net/`;
 
 	let client;
 
 	try {
-		client = await mongoose.connect(MONGODB_URI);
+		client = await mongoose.connect(MONGODB_URI); // Connecting to the MongoDB database
 		console.log("DB connected");
 	} catch (error) {
-		console.log("There was an error connection to the DB", error);
+		console.log("There was an error connecting to the DB", error);
 	}
 
-	const data = await req.json();
+	const data = await req.json(); // Parsing the JSON data from the request body
 
-	const { name, email, company, message } = data;
+	const { name, email, company, message } = data; // Extracting relevant data from the request body
 
 	if (
 		!name ||
@@ -28,10 +30,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
 		message.trim() === "" ||
 		name.trim() === ""
 	) {
+		// Checking if any required fields are missing or if email is invalid
 		NextResponse.json(
 			{ message: "Invalid input - fill all the fields" },
 			{
-				status: 422,
+				status: 422, // Returning a response with a status code of 422 (Unprocessable Entity)
 			}
 		);
 		return;
@@ -39,16 +42,16 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
 	const newData = {
 		...data,
-		date: new Date(),
+		date: new Date(), // Adding the current date to the data object
 	};
 
 	try {
-		await Message.create(newData);
+		await Message.create(newData); // Creating a new Message document in the database
 		console.log("Message Sent");
 		return NextResponse.json(
 			{ message: "Message sent" },
 			{
-				status: 201,
+				status: 201, // Returning a response with a status code of 201 (Created)
 			}
 		);
 	} catch (error) {
@@ -56,7 +59,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 		return NextResponse.json(
 			{ message: "Error sending the message" },
 			{
-				status: 500,
+				status: 500, // Returning a response with a status code of 500 (Internal Server Error)
 			}
 		);
 	}
