@@ -6,9 +6,9 @@ import Message from "../../../models/Message"; // Importing the Message model
 export async function POST(req: NextRequest, res: NextResponse) {
 
 	// Constructing the MongoDB connection URI using environment variables
-	const MONGO_USERNAME = process.env.MONGO_USERNAME;
-	const MONGO_PASSWORD = process.env.MONGO_PASSWORD;
 	const MONGODB_CLUSTER = process.env.MONGODB_CLUSTER;
+	const MONGO_PASSWORD = process.env.MONGO_PASSWORD;
+	const MONGO_USERNAME = process.env.MONGO_USERNAME;
 	// Use MONGODB_URI in your code to connect to MongoDB
 	const MONGODB_URI = `mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGODB_CLUSTER}`;
 
@@ -16,9 +16,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
 	try {
 		client = await mongoose.connect(MONGODB_URI); // Connecting to the MongoDB database
-		console.log("DB connected");
+		console.log("MongoDB connected");
 	} catch (error) {
-		console.log("There was an error connecting to the DB", error);
+		console.log("There was an error connecting to MongoDB", error);
 	}
 
 	const data = await req.json(); // Parsing the JSON data from the request body

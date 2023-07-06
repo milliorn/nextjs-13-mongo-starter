@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server"; // Importing Next.js server components
 const fs = require("fs"); // Importing the Node.js file system module
 const path = require("path"); // Importing the Node.js path module
+import { NextRequest, NextResponse } from "next/server"; // Importing Next.js server components
 
 // Handling a POST request to this endpoint
 export async function POST(request: NextRequest) {
@@ -34,9 +34,3 @@ export async function POST(request: NextRequest) {
 		message: "This message has been successfully sent",
 	});
 }
-
-/* export async function GET() {
-	return NextResponse.json({
-		message: "It's time to Code!!",
-	});
-} */
