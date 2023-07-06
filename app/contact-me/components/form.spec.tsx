@@ -1,161 +1,188 @@
 import "@testing-library/jest-dom";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "isomorphic-fetch";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import React from "react";
-import { setupServer } from "msw/node";
 import { rest } from "msw";
+import { setupServer } from "msw/node";
 import { Form } from "./form";
+import React from "react";
 
+// Configure mock API endpoints
 const handlers = [
-	rest.post("/api/contact", async (req, res, ctx) => {
-		const { email } = await req.json();
+  rest.post("/api/contact", async (req, res, ctx) => {
+    const { email } = await req.json();
 
-		if (email === "bad_request@response.co.uk") {
-			return res(
-				ctx.status(400),
-				ctx.json({
-					message: "Bad Request",
-				})
-			);
-		} else if (email === "internal_error@response.co.uk") {
-			return res(
-				ctx.status(500),
-				ctx.json({
-					message: "Internal Sever Error",
-				})
-			);
-		}
+    // Handle different email values
+    if (email === "bad_request@response.co.uk") {
+      return res(
+        ctx.status(400),
+        ctx.json({
+          message: "Bad Request",
+        })
+      );
+    } else if (email === "internal_error@response.co.uk") {
+      return res(
+        ctx.status(500),
+        ctx.json({
+          message: "Internal Server Error",
+        })
+      );
+    }
 
-		return res(ctx.status(200), ctx.json({ message: "Success!" }));
-	}),
+    // Default response for successful request
+    return res(ctx.status(200), ctx.json({ message: "Success!" }));
+  }),
 ];
 
+// Create mock server using MSW
 const server = setupServer(...handlers);
 
-describe("Contatct Form component", () => {
-	const consoleSpy = jest.spyOn(console, "log").mockImplementation();
+// Test suite for the Contact Form component
+describe("Contact Form component", () => {
+  // Spy on console.log to track logs
+  const consoleSpy = jest.spyOn(console, "log").mockImplementation();
 
-	beforeAll(() => server.listen());
-	afterEach(() => {
-		server.restoreHandlers(), consoleSpy.mockClear();
-	});
-	afterAll(() => server.close());
+  // Set up server before running the tests
+  beforeAll(() => server.listen());
 
-	it("should submit the form and show a succesful message", async () => {
-		render(<Form />);
+  // Clean up after each test
+  afterEach(() => {
+    server.restoreHandlers();
+    consoleSpy.mockClear();
+  });
 
-		fireEvent.change(screen.getByLabelText("Name"), {
-			target: {
-				value: "Alicia",
-			},
-		});
+  // Close server after running the tests
+  afterAll(() => server.close());
 
-		fireEvent.change(screen.getByLabelText("Company"), {
-			target: {
-				value: "Time to code",
-			},
-		});
+  // Test case for successful form submission
+  it("should submit the form and show a successful message", async () => {
+    // Render the form
+    render(<Form />);
 
-		fireEvent.change(screen.getByLabelText("Email"), {
-			target: {
-				value: "time2code@gmail.com",
-			},
-		});
+    // Fill in form fields
+    fireEvent.change(screen.getByLabelText("Name"), {
+      target: {
+        value: "Scott",
+      },
+    });
 
-		fireEvent.change(screen.getByLabelText("Message"), {
-			target: {
-				value: "Hey there!",
-			},
-		});
+    fireEvent.change(screen.getByLabelText("Company"), {
+      target: {
+        value: "Freelancer",
+      },
+    });
 
-		fireEvent.submit(
-			screen.getByRole("button", {
-				name: "Send Message",
-			})
-		);
+    fireEvent.change(screen.getByLabelText("Email"), {
+      target: {
+        value: "example@gmail.com",
+      },
+    });
 
-		await waitFor(() => {
-			expect(screen.getByText("Message has been Sent")).toBeInTheDocument();
-		});
-	});
+    fireEvent.change(screen.getByLabelText("Message"), {
+      target: {
+        value: "Hey there world!",
+      },
+    });
 
-	it("should handle 400 Bad Request resonse", async () => {
-		render(<Form />);
+    // Submit the form
+    fireEvent.submit(
+      screen.getByRole("button", {
+        name: "Send Message",
+      })
+    );
 
-		fireEvent.change(screen.getByLabelText("Name"), {
-			target: {
-				value: "Alicia",
-			},
-		});
+    // Wait for the success message to appear
+    await waitFor(() => {
+      expect(screen.getByText("Message has been Sent")).toBeInTheDocument();
+    });
+  });
 
-		fireEvent.change(screen.getByLabelText("Company"), {
-			target: {
-				value: "Time to code",
-			},
-		});
+  // Test case for handling 400 Bad Request response
+  it("should handle 400 Bad Request response", async () => {
+    // Render the form
+    render(<Form />);
 
-		fireEvent.change(screen.getByLabelText("Email"), {
-			target: {
-				value: "bad_request@response.co.uk",
-			},
-		});
+    // Fill in form fields
+    fireEvent.change(screen.getByLabelText("Name"), {
+      target: {
+        value: "Alicia",
+      },
+    });
 
-		fireEvent.change(screen.getByLabelText("Message"), {
-			target: {
-				value: "Hey there!",
-			},
-		});
+    fireEvent.change(screen.getByLabelText("Company"), {
+      target: {
+        value: "Time to code",
+      },
+    });
 
-		fireEvent.submit(
-			screen.getByRole("button", {
-				name: "Send Message",
-			})
-		);
+    fireEvent.change(screen.getByLabelText("Email"), {
+      target: {
+        value: "bad_request@response.co.uk",
+      },
+    });
 
-		await waitFor(() => {
-			expect(consoleSpy).toHaveBeenCalledWith(
-				"There was a problem with the fetch operation HTTP error! status: 400"
-			);
-		});
-	});
+    fireEvent.change(screen.getByLabelText("Message"), {
+      target: {
+        value: "Hey there!",
+      },
+    });
 
-	it("should handle 500 Internal Sever Error", async () => {
-		render(<Form />);
+    // Submit the form
+    fireEvent.submit(
+      screen.getByRole("button", {
+        name: "Send Message",
+      })
+    );
 
-		fireEvent.change(screen.getByLabelText("Name"), {
-			target: {
-				value: "Alicia",
-			},
-		});
+    // Wait for the error message to be logged
+    await waitFor(() => {
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "There was a problem with the fetch operation HTTP error! status: 400"
+      );
+    });
+  });
 
-		fireEvent.change(screen.getByLabelText("Company"), {
-			target: {
-				value: "Time to code",
-			},
-		});
+  // Test case for handling 500 Internal Server Error
+  it("should handle 500 Internal Server Error", async () => {
+    // Render the form
+    render(<Form />);
 
-		fireEvent.change(screen.getByLabelText("Email"), {
-			target: {
-				value: "internal_error@response.co.uk",
-			},
-		});
+    // Fill in form fields
+    fireEvent.change(screen.getByLabelText("Name"), {
+      target: {
+        value: "Scott",
+      },
+    });
 
-		fireEvent.change(screen.getByLabelText("Message"), {
-			target: {
-				value: "Hey there!",
-			},
-		});
+    fireEvent.change(screen.getByLabelText("Company"), {
+      target: {
+        value: "Freelancer",
+      },
+    });
 
-		fireEvent.submit(
-			screen.getByRole("button", {
-				name: "Send Message",
-			})
-		);
+    fireEvent.change(screen.getByLabelText("Email"), {
+      target: {
+        value: "internal_error@response.co.uk",
+      },
+    });
 
-		await waitFor(() => {
-			expect(consoleSpy).toHaveBeenCalledWith(
-				"There was a problem with the fetch operation HTTP error! status: 500"
-			);
-		});
-	});
+    fireEvent.change(screen.getByLabelText("Message"), {
+      target: {
+        value: "Hey there, Message!",
+      },
+    });
+
+    // Submit the form
+    fireEvent.submit(
+      screen.getByRole("button", {
+        name: "Send Message",
+      })
+    );
+
+    // Wait for the error message to be logged
+    await waitFor(() => {
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "There was a problem with the fetch operation HTTP error! status: 500"
+      );
+    });
+  });
 });
