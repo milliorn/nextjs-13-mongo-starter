@@ -1,127 +1,85 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 export const Form = () => {
-	const [isMessageSent, setMessageSent] = useState<boolean>(false);
+  // State variable to track if the message has been sent
+  const [isMessageSent, setMessageSent] = useState<boolean>(false);
 
-	const formRef = useRef<HTMLFormElement | null>(null);
+  // Reference to the form element
+  const formRef = useRef<HTMLFormElement | null>(null);
 
-	async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-		e.preventDefault();
-		const target = e.currentTarget;
+  // Function to handle form submission
+  async function handleSubmit(
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> {
+    e.preventDefault();
+    const target = e.currentTarget;
 
-		const name = target.elements.namedItem("name") as HTMLInputElement;
-		const company = target.elements.namedItem("company") as HTMLInputElement;
-		const email = target.elements.namedItem("email") as HTMLInputElement;
-		const message = target.elements.namedItem("message") as HTMLInputElement;
+    // Accessing form input values
+    const company = target.elements.namedItem("company") as HTMLInputElement;
+    const email = target.elements.namedItem("email") as HTMLInputElement;
+    const message = target.elements.namedItem("message") as HTMLInputElement;
+    const name = target.elements.namedItem("name") as HTMLInputElement;
 
-		const data = {
-			name: name.value,
-			company: company.value,
-			email: email.value,
-			message: message.value,
-		};
+    const data = {
+      company: company.value,
+      email: email.value,
+      message: message.value,
+      name: name.value,
+    };
 
-		try {
-			const response = await fetch("/api/contact", {
-				method: "POST",
-				body: JSON.stringify(data),
-				headers: {
-					"Content-Type": "application/json",
-				},
-			});
-			if (!response.ok) {
-				throw new Error("HTTP error! status: " + response.status);
-			}
-			setMessageSent(true);
-		} catch (error: any) {
-			console.log(
-				"There was a problem with the fetch operation " + error.message
-			);
-		}
-	}
+    try {
+      // Sending a POST request to the server with form data
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-	useEffect(() => {
-		let timeout: NodeJS.Timeout;
-		if (isMessageSent && formRef) {
-			formRef.current?.reset();
-			setTimeout(() => {
-				setMessageSent(false);
-			}, 2000);
-		}
-		return () => {
-			clearTimeout(timeout);
-		};
-	}, [isMessageSent]);
+      if (!response.ok) {
+        throw new Error("HTTP error! status: " + response.status);
+      }
 
-	return (
-		<>
-			<form onSubmit={handleSubmit} className='bg-white p-10' ref={formRef}>
-				<div className='mb-4'>
-					<label className='label-form' htmlFor='name'>
-						Name
-					</label>
-					<input
-						id='name'
-						type='text'
-						name='name'
-						className='input-form'
-						required
-						minLength={3}
-						maxLength={200}
-					/>
-				</div>
+      setMessageSent(true); // Setting the message sent state to true
+    } catch (error: any) {
+      console.log(
+        "There was a problem with the fetch operation " + error.message
+      );
+    }
+  }
 
-				<div className='mb-4'>
-					<label className='label-form' htmlFor='company'>
-						Company
-					</label>
-					<input
-						id='company'
-						type='text'
-						name='company'
-						className='input-form'
-						minLength={2}
-						maxLength={200}
-					/>
-				</div>
+  // Effect to handle resetting the form and clearing the message sent state
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
 
-				<div className='mb-4'>
-					<label className='label-form' htmlFor='email'>
-						Email
-					</label>
-					<input
-						id='email'
-						type='email'
-						name='email'
-						className='input-form'
-						required
-						minLength={2}
-						maxLength={200}
-					/>
-				</div>
+    if (isMessageSent && formRef) {
+      formRef.current?.reset(); // Resetting the form
 
-				<div className='mb-4'>
-					<label className='label-form' htmlFor='message'>
-						Message
-					</label>
-					<textarea
-						id='message'
-						name='message'
-						className='input-form'
-						required
-						minLength={10}
-						maxLength={1000}
-					/>
-				</div>
-				<button
-					type='submit'
-					className='bg-blue rounded-md text-white hover:text-blue hover:bg-white min-w-100 px-5 h-12 border border-slate-300 hover:border-indigo-300hover:border-1'
-				>
-					Send Message
-				</button>
-			</form>
-			{isMessageSent && <p> Message has been Sent</p>}
-		</>
-	);
+      setTimeout(() => {
+        setMessageSent(false); // Clearing the message sent state after 2 seconds
+      }, 2000);
+    }
+
+    return () => {
+      clearTimeout(timeout); // Clearing the timeout when the component unmounts
+    };
+  }, [isMessageSent]);
+
+  return (
+    <>
+      {/* Form fields */}
+      <form onSubmit={handleSubmit} className="bg-white p-10" ref={formRef}>
+        <button
+          type="submit"
+          className="bg-blue rounded-md text-white hover:text-blue hover:bg-white min-w-100 px-5 h-12 border border-slate-300 hover:border-indigo-300hover:border-1"
+        >
+          Send Message
+        </button>
+      </form>
+      {/* Message sent confirmation */}
+      {isMessageSent && <p> Message has been Sent</p>}{" "}
+    </>
+  );
 };

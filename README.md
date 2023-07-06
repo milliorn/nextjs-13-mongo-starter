@@ -60,3 +60,7 @@ Click on `Add My Current IP Address` button. Then click on `Finish and Close` bu
 #### Database Deployments
 
 Click on `Connect` link. Select how you want to `Access your d ata through tools`. I chose `MongoDB for VS Code`. Follow instructions.
+
+#### Browse Collections
+
+Click on `Browse Collections` tab. It is found under Data Services. Messages will be found there.
