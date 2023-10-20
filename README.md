@@ -1,5 +1,7 @@
 # nextjs-13-mongo-starter
 
+[![CodeQL](https://github.com/milliorn/nextjs-13-mongo-starter/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/milliorn/nextjs-13-mongo-starter/actions/workflows/github-code-scanning/codeql)
+
 ## MongoDB
 
 ### Signup
