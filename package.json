@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "@babel/preset-env": "^7.22.2",
-    "@babel/preset-react": "^7.22.3",
+    "@babel/preset-react": "^7.22.15",
     "@babel/preset-typescript": "^7.21.5",
     "babel-jest": "^29.7.0",
     "mongoose": "^7.5.0",
