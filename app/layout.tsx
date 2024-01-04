@@ -3,6 +3,7 @@ import { Footer } from "./components/footer";
 import { Header } from "./components/header";
 import { aboutMeData, contactMeLinks, pages } from "./data/data";
 import "./global.css";
+import LayoutHead from "./head";
 
 export default function RootLayout({
   children,
@@ -10,8 +11,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }): JSX.Element {
   return (
-    <html>
-      <head />
+    <html lang="en">
+      <LayoutHead />
       <body>
         <Header name={aboutMeData.name} pages={pages} />
         <main className="sm:mb-32 mb-16">{children}</main>
