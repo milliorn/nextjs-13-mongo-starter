@@ -1,35 +1,29 @@
 import "@testing-library/jest-dom";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "isomorphic-fetch";
-import { rest } from "msw";
+import { HttpResponse, http } from "msw";
 import { setupServer } from "msw/node";
 import { Form } from "./form";
 import React from "react";
 
 // Configure mock API endpoints
 const handlers = [
-  rest.post("/api/contact", async (req, res, ctx) => {
-    const { email } = await req.json();
+  http.post("/api/contact", async ({ params }) => {
+    const { email } = params;
 
     // Handle different email values
     if (email === "bad_request@response.co.uk") {
-      return res(
-        ctx.status(400),
-        ctx.json({
-          message: "Bad Request",
-        })
-      );
+      return HttpResponse.json({
+        message: "Bad Request",
+      });
     } else if (email === "internal_error@response.co.uk") {
-      return res(
-        ctx.status(500),
-        ctx.json({
-          message: "Internal Server Error",
-        })
-      );
+      return HttpResponse.json({
+        message: "Internal Server Error",
+      });
     }
 
     // Default response for successful request
-    return res(ctx.status(200), ctx.json({ message: "Success!" }));
+    return HttpResponse.json({ message: "Success!" });
   }),
 ];
 
