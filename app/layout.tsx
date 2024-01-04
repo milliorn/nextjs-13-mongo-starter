@@ -11,7 +11,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }): JSX.Element {
   return (
-    <html>
+    <html lang="en">
       <LayoutHead />
       <body>
         <Header name={aboutMeData.name} pages={pages} />
